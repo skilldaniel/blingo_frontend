@@ -429,15 +429,15 @@ export class GameScreen extends Container {
             prevAction: prevAction,
         });
 
-        console.log('prevAction', prevAction);
-        console.log('spinType', spinType);
-        console.log('action', action);
-        console.log('spinPrice', spinPrice);
-        console.log('spinPattern', spinPattern);
-        console.log('matchedPattern', matchedPattern);
-        console.log('choosedPattern', choosedPattern);
-        console.log('winNumber', winNumber);
-        console.log('winLines', winLines);
+        console.log(`--------------> ${action} <--------------`);
+        console.log('prevAction :: ', prevAction);
+        console.log('spinType :: ', spinType);
+        // console.log('spinPrice', spinPrice);
+        // console.log('spinPattern', spinPattern);
+        // console.log('matchedPattern', matchedPattern);
+        // console.log('choosedPattern', choosedPattern);
+        // console.log('winNumber', winNumber);
+        // console.log('winLines', winLines);
 
         if (gameState.currentState.isTurbo) {
             gameState.currentState.isServerDataRecieved = new Array(5).fill(true);
@@ -454,8 +454,8 @@ export class GameScreen extends Container {
         if (newWinNumber) this.bonusInfo.updateWinStateBonusInfo(gameState.currentState.winNumber);
         /** Update remain spin number */
         this.gameButtons.spinNumberButton.updateSpinNumber(gameState.currentState.spinNumber);
-        console.log(`>>>>>>spinType`, spinType);
         if (spinType === 'FREE_PURCHASE_SPIN') {
+            console.log(`---- spinType === 'FREE_PURCHASE_SPIN' case ::`)
             /** Show Free Spin Wheel */
             if (freeNumber === 4) {
                 this.imagePopUp.updateImage('Popup/Text/es_chance');
@@ -533,36 +533,50 @@ export class GameScreen extends Container {
 
         if (spinType === 'PURCHASE_SPIN') {
             /** When first purchase_spin */
-            gameState.setGameState({
-                gameState: 'purchase',
-                balance: response.data?.balance.cash,
-            });
-
+            console.log(`spinType === 'PURCHASE_SPIN' case :: prevSpinType=${prevSpinType}, action=${action}`)
+            console.log(`balance1=${gameState.currentState.balance}`)
+            
             /** Update Balance */
-            this.gameBottom.updateBalance(gameState.currentState.balance);
+            if( prevAction!=="CHOOSE_CELL" ) {
+                gameState.setGameState({
+                    gameState: 'purchase',
+                    balance: response.data?.balance.cash,
+                });
+                console.log(`balance2=${gameState.currentState.balance}`)
+                this.gameBottom.updateBalance(gameState.currentState.balance);
+            }
             
             /** Update Spin Button State */
-            this.gameButtons.spinButton.updateButtonType(false, gameState.currentState.spinPrice);
-            
+            console.log(`action=${action}`)
+            switch (action) {
+                case "CHOOSE_CELL":
+                    this.gameButtons.spinButton.updateButtonType(false, gameState.currentState.spinPrice);
+                    break;
+                case "SPIN":
+                    console.log(`here?`)
+                    this.gameButtons.spinButton.updateButtonType(false, gameState.currentState.spinPrice);
+                    break;
+            }
             /** Update Spin Number Button */
             this.gameButtons.spinNumberButton.alpha = 1;
             this.gameButtons.spinNumberButton.updateSpinType('EXTRA SPINS');
             this.gameButtons.spinNumberButton.updateSpinNumber(gameState.currentState.purchaseSpinNumber);
 
-            if(prevSpinType === "FREE_PURCHASE_SPIN") {
-                /** Show Stop Button */
-                this.gameTable.showStopButton();
-            }
+            // if(prevSpinType === "FREE_PURCHASE_SPIN") {
+            //     /** Show Stop Button */
+            //     this.gameTable.showStopButton();
+            // }
         }
 
         if (spinType === 'FREE_SPIN') {
+            console.log(`---- spinType === 'FREE_SPIN' case ::`)
             this.gameTable.gameSpinReel.spin();
             this.callAPI(2);
         }
 
         if (prevAction === 'CHOOSE_CELL') {
             /** When Choose State */
-
+            console.log(`---- your prevAction is ${prevAction}`)
             let delayTime = 0;
 
             /** When Purple Gem exist*/
@@ -623,6 +637,8 @@ export class GameScreen extends Container {
                 }, delayTime);
             }
             /** When Spin State */
+            console.log(`step2 ? action=${action}, spinType=${spinType}`)
+
             if (action === 'SPIN' || action === 'NONE') {
                 /** Update Game Bottom Description */
                 this.gameBottom.updateDescription('');
@@ -649,6 +665,7 @@ export class GameScreen extends Container {
         }
         /** This case peformance doLastAction function */
         if (prevAction === 'SPIN' || prevAction === 'NONE') {
+            console.log(`---- here prevAction is ${prevAction}`)
         }
     }
 
@@ -772,59 +789,63 @@ export class GameScreen extends Container {
         try {
             let data;
             let response;
+            const gameId = "slingo-starburst";
+            const token = "fun@yyfexssupw1m3pohr1h";
+            const gameInstanceId = 90761213;
+            const userId = 24678110;
             switch (callSpinType) {
                 case 0:
                     data = {
                         firstGame: callSpinParam === 1 ? true : false,
-                        gameId: 'slingo-starburst',
-                        token: 'fun@yyfexssupw1m3pohr1h',
+                        gameId: gameId,
+                        token: token,
                     };
                     response = await axios.post(SERVER_URL + '/api/gamestudio/rogue/starburst/currentGame', data);
-                    console.log('currentResponse', response);
+                    // console.log('currentResponse', response);
                     this.setDataCurrent(response);
                     break;
                 case 1:
                     data = {
                         currencyCode: gameState.currentState.currency,
-                        gameId: 'slingo-starburst',
+                        gameId: gameId,
                         stake: gameState.currentState.stake,
                         ticketId: gameState.currentState.ticketID,
-                        token: 'fun@yyfexssupw1m3pohr1h',
-                        userId: 24678110,
+                        token: token,
+                        userId: userId,
                     };
                     response = await axios.post(SERVER_URL + '/api/gamestudio/rogue/starburst/startGame', data);
-                    console.log('startResponse', response);
+                    // console.log('startResponse', response);
                     this.setDataStart(response);
                     break;
                 case 2:
                     data = {
-                        gameId: 'slingo-starburst',
-                        gameInstanceId: 90761213,
-                        token: 'fun@yyfexssupw1m3pohr1h',
-                        userId: 24678110,
+                        gameId: gameId,
+                        gameInstanceId: gameInstanceId,
+                        token: token,
+                        userId: userId,
                     };
                     response = await axios.post(SERVER_URL + '/api/gamestudio/rogue/starburst/spin', data);
-                    console.log('spinResponse', response);
+                    // console.log('spinResponse', response);
                     this.setDataSpin(response);
                     break;
                 case 3:
                     data = {
                         cellNumber: callSpinParam,
-                        gameId: 'slingo-starburst',
-                        gameInstanceId: 90761213,
-                        token: 'fun@yyfexssupw1m3pohr1h',
-                        userId: 24678110,
+                        gameId: gameId,
+                        gameInstanceId: gameInstanceId,
+                        token: token,
+                        userId: userId,
                     };
                     response = await axios.post(SERVER_URL + '/api/gamestudio/rogue/starburst/chooseCell', data);
-                    console.log('chooseResponse', response);
+                    // console.log('chooseResponse', response);
                     this.setDataSpin(response);
                     break;
                 case 4:
                     data = {
-                        gameId: 'slingo-starburst',
-                        gameInstanceId: 90761213,
-                        token: 'fun@yyfexssupw1m3pohr1h',
-                        userId: 24678110,
+                        gameId: gameId,
+                        gameInstanceId: gameInstanceId,
+                        token: token,
+                        userId: userId,
                     };
                     response = await axios.post(SERVER_URL + '/api/gamestudio/rogue/starburst/collect', data);
                     console.log('collectResponse', response);
