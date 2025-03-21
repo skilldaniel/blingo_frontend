@@ -280,7 +280,7 @@ export class GameSpinReel extends Container {
                             if (gameState.currentState.action === 'SPIN' || gameState.currentState.action === 'NONE') {
                                 /** Update Game Bottom Description */
                                 navigation?.currentScreen?.gate?.('updateGameBottomDescription', '');
-                                setTimeout(async () => {                                    
+                                setTimeout(async () => {
                                     if (gameState.currentState.spinType === 'STANDARD_SPIN') {
                                         if (gameState.currentState.spinNumber >= 1)
                                             navigation?.currentScreen?.gate?.('gameSpinSlotSpin');

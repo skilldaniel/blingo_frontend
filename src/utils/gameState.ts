@@ -3,6 +3,9 @@ import { getUrlParam } from './getUrlParams';
 import { bgm, sfx } from './audio';
 interface IGameState {
     /** Game State */
+    token: string;
+    userId: string;
+    gameId: string;
     rtp: number;
     language: string;
     currency: string;
@@ -68,6 +71,9 @@ interface IGameState {
  */
 class GameState {
     private state: IGameState = {
+        token: '',
+        userId: '',
+        gameId: '',
         rtp: 0,
         language: getUrlParam(URL_PARAMS.language) || DEFAULT_LANGUAGE_CODE,
         currency: getUrlParam(URL_PARAMS.currency) || DEFAULT_CURRENCY_CODE,

@@ -45,7 +45,23 @@ export class LoadScreen extends Container {
         /** Add Rotate Alert */
         this.rotateAlert = new RotateAlert();
         this.addChild(this.rotateAlert);
+        const info = this.getInfoFromUrl();
+        gameState.setGameState({
+            token: info.token,
+            userId: info.userId,
+            gameId: info.gameId,
+        });
     }
+
+    private getInfoFromUrl = () => {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        return {
+            token: urlParams.get('token'),
+            userId: urlParams.get('userId'),
+            gameId: urlParams.get('gameId'),
+        };
+    };
 
     // Fired when the assets loding is in progress, update the progressbar
     private onProgress = (progress: number) => {
